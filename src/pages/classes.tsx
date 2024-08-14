@@ -225,27 +225,35 @@ const Oqituvchilar: React.FC = () => {
         </div>
         <div style={{ marginTop: "10px" }}>
           <label>*Sinf</label>
-          <select name="" id="">
-            <option value="">1A</option>
-            <option value="">1B</option>
-            <option value="">2A</option>
-            <option value="">2B</option>
-            <option value="">3A</option>
-            <option value="">3B</option>
-            <option value="">4B</option>
-            <option value="">4A</option>
-            <option value="">5B</option>
-            <option value="">6A</option>
-            <option value="">6B</option>
-
-          </select>
-          <Input
+          <select
+            onChange={handleInputChange}
             name="sinf"
-            placeholder="Sinf"
             value={addTeacher.sinf}
             style={{ marginTop: "5px", padding: "10px" }}
-            onChange={handleInputChange}
-          />
+          >
+            <option value="1A">1A</option>
+            <option value="1B">1B</option>
+            <option value="2A">2A</option>
+            <option value="2B">2B</option>
+            <option value="3A">3A</option>
+            <option value="3B">3B</option>
+            <option value="4A">4A</option>
+            <option value="4B">4B</option>
+            <option value="5A">5A</option>
+            <option value="5B">5B</option>
+            <option value="6A">6A</option>
+            <option value="6B">6B</option>
+            <option value="7A">7A</option>
+            <option value="7B">7B</option>
+            <option value="8A">8A</option>
+            <option value="8B">8B</option>
+            <option value="9A">9A</option>
+            <option value="9B">9B</option>
+            <option value="10A">10A</option>
+            <option value="10B">10B</option>
+            <option value="11A">11A</option>
+            <option value="11B">11B</option>
+          </select>
         </div>
       </Modal>
 
