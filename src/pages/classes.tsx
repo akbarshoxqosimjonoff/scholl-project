@@ -283,19 +283,7 @@ const Oqituvchilar: React.FC = () => {
               { required: true, message: "Please input the teacher's name!" },
             ]}
           >
-            <select
-              onChange={handleInputChange}
-              name="teacherName"
-              value={addTeacher.teacherName} // Set the value for controlled component
-              style={{ marginTop: "5px", padding: "10px" }}
-            >
-              <option value="Sarvar Akramov">Sarvar Akramov</option>
-              <option value="Dilnoza Karimova">Dilnoza Karimova</option>
-              <option value="Abdulloh Raxmatullayev">
-                Abdulloh Raxmatullayev
-              </option>
-              <option value="Gulbahor Sobirova">Gulbahor Sobirova</option>
-            </select>
+            <Input />
           </Form.Item>
           <Form.Item
             name="sinf"

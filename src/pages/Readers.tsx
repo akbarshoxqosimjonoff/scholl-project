@@ -308,9 +308,9 @@ const Oquvchilar: React.FC = () => {
             <Input />
           </Form.Item>
           <Form.Item
-            name="subject"
-            label="Subject"
-            rules={[{ required: true, message: "Please select the subject!" }]}
+            name="class"
+            label="class"
+            rules={[{ required: true, message: "Please select the class!" }]}
           >
             <Select>
               <Select.Option value="Math">Math</Select.Option>
@@ -327,7 +327,7 @@ const Oquvchilar: React.FC = () => {
           >
             <Input />
           </Form.Item>
-          <Form.Item name="phone" label="Phone">
+          <Form.Item name="Act" label="Act">
             <Input />
           </Form.Item>
         </Form>
