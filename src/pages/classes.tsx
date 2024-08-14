@@ -79,8 +79,14 @@ const Oqituvchilar: React.FC = () => {
     onChange: onSelectChange,
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setAddTeacher({ ...addTeacher, [e.target.name]: e.target.value });
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    setAddTeacher((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   const showModal = () => {
@@ -91,7 +97,7 @@ const Oqituvchilar: React.FC = () => {
     setTeacherData([...teacherData, { ...addTeacher, key: Date.now() }]);
     setIsModalOpen(false);
     setAddTeacher({
-      key: Date.now(),
+      key: Date.now(), // Reset key for new entry
       teacherName: "",
       sinf: "",
     });
@@ -203,17 +209,36 @@ const Oqituvchilar: React.FC = () => {
         onCancel={handleCancel}
       >
         <div style={{ marginTop: "10px" }}>
-          <label>*Teacher Name</label>
-          <Input
-            name="teacherName"
-            placeholder="Teacher Name"
-            value={addTeacher.teacherName}
-            style={{ marginTop: "5px", padding: "10px" }}
+          <select
             onChange={handleInputChange}
-          />
+            name="teacherName"
+            value={addTeacher.teacherName} // Set the value for controlled component
+            style={{ marginTop: "5px", padding: "10px" }}
+          >
+            <option value="Sarvar Akramov">Sarvar Akramov</option>
+            <option value="Dilnoza Karimova">Dilnoza Karimova</option>
+            <option value="Abdulloh Raxmatullayev">
+              Abdulloh Raxmatullayev
+            </option>
+            <option value="Gulbahor Sobirova">Gulbahor Sobirova</option>
+          </select>
         </div>
         <div style={{ marginTop: "10px" }}>
           <label>*Sinf</label>
+          <select name="" id="">
+            <option value="">1A</option>
+            <option value="">1B</option>
+            <option value="">2A</option>
+            <option value="">2B</option>
+            <option value="">3A</option>
+            <option value="">3B</option>
+            <option value="">4B</option>
+            <option value="">4A</option>
+            <option value="">5B</option>
+            <option value="">6A</option>
+            <option value="">6B</option>
+
+          </select>
           <Input
             name="sinf"
             placeholder="Sinf"
