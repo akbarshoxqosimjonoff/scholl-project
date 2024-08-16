@@ -67,8 +67,24 @@ const Oqituvchilar: React.FC = () => {
       key: "action",
       render: (_, record) => (
         <Space>
-          <Button onClick={() => handleEdit(record)}>Edit</Button>
-          <Button onClick={() => handleDelete(record.key)}>Delete</Button>
+          <Button
+            style={{
+              backgroundColor: "green",
+              color: "#fff",
+            }}
+            onClick={() => handleEdit(record)}
+          >
+            Edit
+          </Button>
+          <Button
+            style={{
+              backgroundColor: "red",
+              color: "#fff",
+            }}
+            onClick={() => handleDelete(record.key)}
+          >
+            Delete
+          </Button>
         </Space>
       ),
     },
@@ -137,7 +153,7 @@ const Oqituvchilar: React.FC = () => {
       <Button
         onClick={showModal}
         style={{
-          backgroundColor: "#3498db",
+          backgroundColor: "green",
           color: "#fff",
           padding: "10px",
           borderRadius: "5px",
@@ -179,7 +195,7 @@ const Oqituvchilar: React.FC = () => {
         <Button
           onClick={handleClearSearch}
           style={{
-            backgroundColor: "#3498db",
+            backgroundColor: "green",
             color: "#fff",
             padding: "10px",
             borderRadius: "5px",

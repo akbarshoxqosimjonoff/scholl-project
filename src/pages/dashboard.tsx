@@ -1,4 +1,4 @@
-import { Modal, Button, Space, Table } from "antd";
+import { Modal, Button, Space, Table, Input } from "antd";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import React, { useState, useEffect } from "react";
 
@@ -35,9 +35,10 @@ const Dashboard: React.FC = () => {
     undefined
   );
   const [data, setData] = useState<DataType[]>(initialData);
+  const [editModalVisible, setEditModalVisible] = useState(false);
+  const [editingYear, setEditingYear] = useState<DataType | null>(null);
 
   useEffect(() => {
-    // Load data from localStorage when the component mounts
     const storedData = localStorage.getItem("tableData");
     if (storedData) {
       setData(JSON.parse(storedData));
@@ -45,7 +46,6 @@ const Dashboard: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    // Save data to localStorage whenever data changes
     localStorage.setItem("tableData", JSON.stringify(data));
   }, [data]);
 
@@ -74,16 +74,43 @@ const Dashboard: React.FC = () => {
   };
 
   const handleCancel = () => {
-    console.log("Clicked cancel button");
     setOpen(false);
   };
 
   const handleSelectChange = (value: string) => {
     setSelectedYear(value);
   };
+
   const handleDelete = (key: React.Key) => {
     const newData = data.filter((item) => item.key !== key);
     setData(newData);
+  };
+
+  const showEditModal = (record: DataType) => {
+    setEditingYear(record);
+    setEditModalVisible(true);
+  };
+
+  const handleEditOk = () => {
+    if (editingYear) {
+      const newData = data.map((item) =>
+        item.key === editingYear.key ? editingYear : item
+      );
+      setData(newData);
+      setEditingYear(null);
+    }
+    setEditModalVisible(false);
+  };
+
+  const handleEditCancel = () => {
+    setEditModalVisible(false);
+    setEditingYear(null);
+  };
+
+  const handleYearChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (editingYear) {
+      setEditingYear({ ...editingYear, OquvYili: e.target.value });
+    }
   };
 
   return (
@@ -102,6 +129,7 @@ const Dashboard: React.FC = () => {
         <Button
           style={{
             margin: "10px",
+            backgroundColor: "green",
           }}
           type="primary"
           onClick={showModal}
@@ -111,7 +139,7 @@ const Dashboard: React.FC = () => {
       </div>
 
       <Modal
-        title="Title"
+        title="Yangi o'quv yili qo'shish"
         open={open}
         onOk={handleOk}
         confirmLoading={confirmLoading}
@@ -137,20 +165,37 @@ const Dashboard: React.FC = () => {
         </select>
       </Modal>
 
-      <Table dataSource={data} rowKey="key">
+      <Modal
+        title="Edit O'quv Yili"
+        open={editModalVisible}
+        onOk={handleEditOk}
+        onCancel={handleEditCancel}
+      >
+        <Input
+          value={editingYear?.OquvYili}
+          onChange={handleYearChange}
+          style={{ padding: "10px", fontSize: "16px", height: "50px" }}
+        />
+      </Modal>
+
+      <Table
+        dataSource={data}
+        rowKey="key"
+        pagination={{ pageSize: 5 }}
+      >
         <Column title="O'quv Yili" dataIndex="OquvYili" key="OquvYili" />
         <Column title="Tanlash" dataIndex="tanlash" key="tanlash" />
         <Column
-          title="Action"
+          title="Amallar"
           key="action"
           render={(_: any, record: DataType) => (
             <Space size="small" style={{ fontSize: 20 }}>
-              <a>
+              <a onClick={() => showEditModal(record)}>
                 <EditOutlined />
               </a>
               <a
                 onClick={() => handleDelete(record.key)}
-                style={{ color: "#f5222d" }}
+                style={{ color: "red" }}
               >
                 <DeleteOutlined />
               </a>

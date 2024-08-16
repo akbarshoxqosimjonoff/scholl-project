@@ -11,70 +11,6 @@ const Jurnal = () => {
       physics: 63,
       chemistry: 87,
     },
-    {
-      name: "Aslbek",
-      maths: 98,
-      english: 88,
-      biology: 58,
-      physics: 85,
-      chemistry: 90,
-    },
-    {
-      name: "Islom",
-      maths: 85,
-      english: 95,
-      biology: 45,
-      physics: 90,
-      chemistry: 81,
-    },
-    {
-      name: "Maruf",
-      maths: 32,
-      english: 62,
-      biology: 98,
-      physics: 98,
-      chemistry: 62,
-    },
-    {
-      name: "Akbar",
-      maths: 66,
-      english: 46,
-      biology: 73,
-      physics: 66,
-      chemistry: 76,
-    },
-    {
-      name: "Laziz",
-      maths: 72,
-      english: 12,
-      biology: 54,
-      physics: 70,
-      chemistry: 72,
-    },
-    {
-      name: "Nurbek",
-      maths: 56,
-      english: 66,
-      biology: 93,
-      physics: 88,
-      chemistry: 44,
-    },
-    {
-      name: "Alisherbek",
-      maths: 98,
-      english: 65,
-      biology: 44,
-      physics: 99,
-      chemistry: 77,
-    },
-    {
-      name: "Nurislom",
-      maths: 92,
-      english: 52,
-      biology: 82,
-      physics: 77,
-      chemistry: 49,
-    },
   ];
 
   return (
@@ -120,12 +56,12 @@ const Jurnal = () => {
           <thead>
             <tr>
               <th>STUDENT NAME</th>
-              <th>MATHS</th>
-              <th>ENGLISH</th>
-              <th>BIOLOGY</th>
-              <th>PHYSICS</th>
-              <th>CHEMISTRY</th>
-              <th>TOTAL MARKS</th>
+              <th>Matematika</th>
+              <th>ingilis tili</th>
+              <th>Biologiya</th>
+              <th>Fizika</th>
+              <th>Kimyo</th>
+              <th>Jami</th>
             </tr>
           </thead>
           <tbody>

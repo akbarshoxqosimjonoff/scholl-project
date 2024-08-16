@@ -45,134 +45,6 @@ const initialData: ParentDataType[] = [
     childClass: "3A",
     childTeacher: "Dilshod Ahmedov",
   },
-  {
-    key: 5,
-    firstName: "Shukur",
-    lastName: "Jalilov",
-    childName: "Iskandar Jalilov",
-    childClass: "7B",
-    childTeacher: "Sardorbek Murodov",
-  },
-  {
-    key: 6,
-    firstName: "Madina",
-    lastName: "Karimova",
-    childName: "Elena Karimova",
-    childClass: "5B",
-    childTeacher: "Javlonbek Yusupov",
-  },
-  {
-    key: 7,
-    firstName: "Akram",
-    lastName: "Salimov",
-    childName: "Otabek Salimov",
-    childClass: "8C",
-    childTeacher: "Aziza Mamatova",
-  },
-  {
-    key: 8,
-    firstName: "Dilnoza",
-    lastName: "Saidova",
-    childName: "Dildora Saidova",
-    childClass: "6A",
-    childTeacher: "Sukhrab Murodov",
-  },
-  {
-    key: 9,
-    firstName: "Omar",
-    lastName: "Ergashev",
-    childName: "Jamshid Ergashev",
-    childClass: "4A",
-    childTeacher: "Mukhammad Mamatov",
-  },
-  {
-    key: 10,
-    firstName: "Zarina",
-    lastName: "Rakhimova",
-    childName: "Nilufar Rakhimova",
-    childClass: "5C",
-    childTeacher: "Rustam Rahimov",
-  },
-  {
-    key: 11,
-    firstName: "Rauf",
-    lastName: "Rasulov",
-    childName: "Shahzoda Rasulov",
-    childClass: "7A",
-    childTeacher: "Sanjarbek Azizov",
-  },
-  {
-    key: 12,
-    firstName: "Mahbuba",
-    lastName: "Kurbonova",
-    childName: "Farruh Kurbonov",
-    childClass: "8A",
-    childTeacher: "Nargiza Usmonova",
-  },
-  {
-    key: 13,
-    firstName: "Javlon",
-    lastName: "Shukurov",
-    childName: "Otabek Shukurov",
-    childClass: "6B",
-    childTeacher: "Jahonbek Kamilov",
-  },
-  {
-    key: 14,
-    firstName: "Dildora",
-    lastName: "Karimova",
-    childName: "Ravshan Karimov",
-    childClass: "5A",
-    childTeacher: "Qudratbek Ergashev",
-  },
-  {
-    key: 15,
-    firstName: "Zafar",
-    lastName: "Djanov",
-    childName: "Alina Djanova",
-    childClass: "4C",
-    childTeacher: "Asadbek Nurmatov",
-  },
-  {
-    key: 16,
-    firstName: "Gulbahor",
-    lastName: "Yusupova",
-    childName: "Murod Yusupov",
-    childClass: "3B",
-    childTeacher: "Shokhruh Davletov",
-  },
-  {
-    key: 17,
-    firstName: "Ikrom",
-    lastName: "Toshmatov",
-    childName: "Zuhra Toshmatova",
-    childClass: "6C",
-    childTeacher: "Mansurbek Tursunov",
-  },
-  {
-    key: 18,
-    firstName: "Feruza",
-    lastName: "Jumayeva",
-    childName: "Yulduz Jumayeva",
-    childClass: "7C",
-    childTeacher: "Abdulla Nazarov",
-  },
-  {
-    key: 19,
-    firstName: "Bekzod",
-    lastName: "Fazilov",
-    childName: "Sardor Fazilov",
-    childClass: "5B",
-    childTeacher: "Olimbek Nazarov",
-  },
-  {
-    key: 20,
-    firstName: "Sonia",
-    lastName: "Mukhiddinova",
-    childName: "Jasur Mukhiddinov",
-    childClass: "4B",
-    childTeacher: "Gulchehra Tojibayeva",
-  },
 ];
 
 const OtaOnalar: React.FC = () => {
@@ -250,8 +122,14 @@ const OtaOnalar: React.FC = () => {
       key: "actions",
       render: (_, record) => (
         <Space>
-          <Button onClick={() => handleEdit(record)}>Edit</Button>
-          <Button onClick={() => handleDelete(record.key)}>Delete</Button>
+          <Button style={{
+              backgroundColor: "green",
+              color: "#fff",
+            }} onClick={() => handleEdit(record)}>Edit</Button>
+          <Button style={{
+              backgroundColor: "red",
+              color: "#fff",
+            }} onClick={() => handleDelete(record.key)}>Delete</Button>
         </Space>
       ),
     },
@@ -322,6 +200,7 @@ const OtaOnalar: React.FC = () => {
         type="primary"
         onClick={showModal}
         style={{
+          backgroundColor:"green",
           marginBottom: "10px",
         }}
       >
@@ -353,7 +232,7 @@ const OtaOnalar: React.FC = () => {
         <Button
           onClick={handleClearSearch}
           style={{
-            backgroundColor: "#3498db",
+            backgroundColor: "green",
             color: "#fff",
             padding: "10px",
             borderRadius: "5px",

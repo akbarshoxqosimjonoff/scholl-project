@@ -20,7 +20,7 @@ const Oquvchilar: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [studentsData, setStudentsData] = useState<DataType[]>(() => {
     const storedData = localStorage.getItem("studentsData");
-    return storedData ? JSON.parse(storedData) : studentData; // studentData o'rniga teacherData
+    return storedData ? JSON.parse(storedData) : studentData; 
   });
   const [searchText, setSearchText] = useState("");
   const [addTeacher, setAddTeacher] = useState<DataType>({
@@ -87,8 +87,14 @@ const Oquvchilar: React.FC = () => {
       key: "phone",
       render: (_, record) => (
         <Space>
-          <Button onClick={() => handleEdit(record)}>Edit</Button>
-          <Button onClick={() => handleDelete(record.key)}>Delete</Button>
+          <Button  style={{
+              backgroundColor: "green",
+              color: "#fff",
+            }} onClick={() => handleEdit(record)}>Edit</Button>
+          <Button  style={{
+              backgroundColor: "red",
+              color: "#fff",
+            }} onClick={() => handleDelete(record.key)}>Delete</Button>
         </Space>
       ),
     },
@@ -159,7 +165,7 @@ const Oquvchilar: React.FC = () => {
       <button
         onClick={showModal}
         style={{
-          backgroundColor: "#3498db",
+          backgroundColor: "green",
           color: "#fff",
           padding: "10px",
           borderRadius: "5px",
@@ -201,7 +207,7 @@ const Oquvchilar: React.FC = () => {
         <Button
           onClick={handleClearSearch}
           style={{
-            backgroundColor: "#3498db",
+            backgroundColor: "green",
             color: "#fff",
             padding: "10px",
             borderRadius: "5px",
