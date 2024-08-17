@@ -21,30 +21,6 @@ const initialData: ParentDataType[] = [
     childClass: "5A",
     childTeacher: "Sarvar Akramov",
   },
-  {
-    key: 2,
-    firstName: "Nigar",
-    lastName: "Nazarova",
-    childName: "Aisha Nazarova",
-    childClass: "4B",
-    childTeacher: "Elmira Gafurova",
-  },
-  {
-    key: 3,
-    firstName: "Rustam",
-    lastName: "Ibragimov",
-    childName: "Temur Ibragimov",
-    childClass: "6C",
-    childTeacher: "Bekzod Tashkent",
-  },
-  {
-    key: 4,
-    firstName: "Gulnara",
-    lastName: "Khamidova",
-    childName: "Layla Khamidova",
-    childClass: "3A",
-    childTeacher: "Dilshod Ahmedov",
-  },
 ];
 
 const OtaOnalar: React.FC = () => {

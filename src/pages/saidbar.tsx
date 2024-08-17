@@ -94,7 +94,7 @@ const App: React.FC = () => {
             <Route path="/O'qituvchilar" element={<Oqituvchilar />} />
             <Route path="/Siniflar" element={<Siniflar />} />
             <Route path="/O'quvchilar" element={<Oquvchilar />} />
-            <Route path="/Otaonalar" element={<Otaonalar />} />
+            <Route path="/Otaonalar" element={<Otaonalar />} />z
             <Route path="/Jurnal" element={<Jurnal />} />
           </Routes>
         </Content>

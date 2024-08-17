@@ -20,7 +20,7 @@ const Oquvchilar: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [studentsData, setStudentsData] = useState<DataType[]>(() => {
     const storedData = localStorage.getItem("studentsData");
-    return storedData ? JSON.parse(storedData) : studentData; 
+    return storedData ? JSON.parse(storedData) : studentData;
   });
   const [searchText, setSearchText] = useState("");
   const [addTeacher, setAddTeacher] = useState<DataType>({
@@ -42,14 +42,14 @@ const Oquvchilar: React.FC = () => {
     setTimeout(() => {
       const filteredData = searchText
         ? filterData(studentsData, searchText)
-        : studentsData; // studentData o'rniga studentsData
+        : studentsData;
       setStudentsData(filteredData);
       setLoading(false);
-    }, 1000);
-  }, [searchText, studentsData]); // studentsData qo'shilgan
+    }, 10);
+  }, [searchText, studentsData]);
 
   useEffect(() => {
-    localStorage.setItem("studentsData", JSON.stringify(studentsData)); // studentData o'rniga studentsData
+    localStorage.setItem("studentsData", JSON.stringify(studentsData));
   }, [studentsData]);
 
   const filterData = (data: DataType[], search: string) => {
@@ -80,21 +80,30 @@ const Oquvchilar: React.FC = () => {
     { title: "First Name", dataIndex: "firstName", key: "firstName" },
     { title: "Last Name", dataIndex: "lastName", key: "lastName" },
     { title: "Subject", dataIndex: "subject", key: "subject" },
-    { title: "Email", dataIndex: "email", key: "email" },
     {
-      title: "Phone",
-      dataIndex: "phone",
-      key: "phone",
+      title: "action",
+      dataIndex: "action",
+      key: "action",
       render: (_, record) => (
         <Space>
-          <Button  style={{
+          <Button
+            style={{
               backgroundColor: "green",
               color: "#fff",
-            }} onClick={() => handleEdit(record)}>Edit</Button>
-          <Button  style={{
+            }}
+            onClick={() => handleEdit(record)}
+          >
+            Edit
+          </Button>
+          <Button
+            style={{
               backgroundColor: "red",
               color: "#fff",
-            }} onClick={() => handleDelete(record.key)}>Delete</Button>
+            }}
+            onClick={() => handleDelete(record.key)}
+          >
+            Delete
+          </Button>
         </Space>
       ),
     },
@@ -153,8 +162,6 @@ const Oquvchilar: React.FC = () => {
       firstName: student.firstName,
       lastName: student.lastName,
       subject: student.subject,
-      email: student.email,
-      phone: student.phone,
     });
   };
 
@@ -266,16 +273,6 @@ const Oquvchilar: React.FC = () => {
             onChange={handleInputChange}
           />
         </div>
-        <div style={{ marginTop: "10px" }}>
-          <label style={{ marginTop: "10px" }}>*Email</label>
-          <Input
-            name="email"
-            placeholder="Email"
-            value={addTeacher.email}
-            style={{ marginTop: "5px", padding: "10px" }}
-            onChange={handleInputChange}
-          />
-        </div>
       </Modal>
 
       <Modal
@@ -318,23 +315,30 @@ const Oquvchilar: React.FC = () => {
             label="class"
             rules={[{ required: true, message: "Please select the class!" }]}
           >
-            <Select>
-              <Select.Option value="Math">Math</Select.Option>
-              <Select.Option value="English">English</Select.Option>
-              <Select.Option value="Science">Science</Select.Option>
-            </Select>
-          </Form.Item>
-          <Form.Item
-            name="email"
-            label="Email"
-            rules={[
-              { type: "email", message: "The input is not valid E-mail!" },
-            ]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item name="Act" label="Act">
-            <Input />
+            <select name="sinf" style={{ marginTop: "5px", padding: "10px" }}>
+              <option value="1A">1A</option>
+              <option value="1B">1B</option>
+              <option value="2A">2A</option>
+              <option value="2B">2B</option>
+              <option value="3A">3A</option>
+              <option value="3B">3B</option>
+              <option value="4A">4A</option>
+              <option value="4B">4B</option>
+              <option value="5A">5A</option>
+              <option value="5B">5B</option>
+              <option value="6A">6A</option>
+              <option value="6B">6B</option>
+              <option value="7A">7A</option>
+              <option value="7B">7B</option>
+              <option value="8A">8A</option>
+              <option value="8B">8B</option>
+              <option value="9A">9A</option>
+              <option value="9B">9B</option>
+              <option value="10A">10A</option>
+              <option value="10B">10B</option>
+              <option value="11A">11A</option>
+              <option value="11B">11B</option>
+            </select>
           </Form.Item>
         </Form>
       </Modal>
