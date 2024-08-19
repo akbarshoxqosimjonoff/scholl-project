@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { Button, Table, Space, Input, Modal, Form } from "antd";
+import { Button, Table, Space, Input, Modal, Form, Select } from "antd";
 import type { TableColumnsType, TableProps } from "antd";
 import { MdOutlineRestartAlt } from "react-icons/md";
+
+const { Option } = Select;
 
 interface ParentDataType {
   key: number;
@@ -11,6 +13,18 @@ interface ParentDataType {
   childClass: string;
   childTeacher: string;
 }
+
+interface StudentDataType {
+  key: number;
+  firstName: string;
+  lastName: string;
+  className: string;
+  teacherName: string;
+}
+
+const initialStudents: StudentDataType[] = [
+
+];
 
 const initialData: ParentDataType[] = [
   {
@@ -25,10 +39,13 @@ const initialData: ParentDataType[] = [
 
 const OtaOnalar: React.FC = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
-  const [loading, setLoading] = useState(false);
   const [parentData, setParentData] = useState<ParentDataType[]>(() => {
     const storedData = localStorage.getItem("parentData");
     return storedData ? JSON.parse(storedData) : initialData;
+  });
+  const [students, setStudents] = useState<StudentDataType[]>(() => {
+    const storedData = localStorage.getItem("studentsData");
+    return storedData ? JSON.parse(storedData) : initialStudents;
   });
   const [searchText, setSearchText] = useState("");
   const [addParent, setAddParent] = useState<ParentDataType>({
@@ -41,31 +58,26 @@ const OtaOnalar: React.FC = () => {
   });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [open, setOpen] = useState(false);
-  const [currentParent, setCurrentParent] = useState<ParentDataType | null>(
-    null
-  );
+  const [currentParent, setCurrentParent] = useState<ParentDataType | null>(null);
   const [form] = Form.useForm();
 
   useEffect(() => {
-    if (searchText) {
-      const filteredData = filterData(parentData, searchText);
-      setParentData(filteredData);
-    } else {
-      setParentData(initialData);
+    const storedParentData = localStorage.getItem("parentData");
+    const storedStudentData = localStorage.getItem("studentsData");
+
+    if (storedParentData) {
+      setParentData(JSON.parse(storedParentData));
     }
-  }, [searchText]);
+
+    if (storedStudentData) {
+      setStudents(JSON.parse(storedStudentData));
+    }
+  }, []);
 
   useEffect(() => {
     localStorage.setItem("parentData", JSON.stringify(parentData));
-  }, [parentData]);
-
-  const filterData = (data: ParentDataType[], search: string) => {
-    return data.filter((item) =>
-      Object.values(item).some((value) =>
-        value.toString().toLowerCase().includes(search.toLowerCase())
-      )
-    );
-  };
+    localStorage.setItem("studentsData", JSON.stringify(students));
+  }, [parentData, students]);
 
   const onSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchText(e.target.value);
@@ -88,24 +100,24 @@ const OtaOnalar: React.FC = () => {
     { title: "Last Name", dataIndex: "lastName", key: "lastName" },
     { title: "Child's Name", dataIndex: "childName", key: "childName" },
     { title: "Child's Class", dataIndex: "childClass", key: "childClass" },
-    {
-      title: "Child's Teacher",
-      dataIndex: "childTeacher",
-      key: "childTeacher",
-    },
+    { title: "Child's Teacher", dataIndex: "childTeacher", key: "childTeacher" },
     {
       title: "Actions",
       key: "actions",
       render: (_, record) => (
         <Space>
-          <Button style={{
-              backgroundColor: "green",
-              color: "#fff",
-            }} onClick={() => handleEdit(record)}>Edit</Button>
-          <Button style={{
-              backgroundColor: "red",
-              color: "#fff",
-            }} onClick={() => handleDelete(record.key)}>Delete</Button>
+          <Button
+            style={{ backgroundColor: "green", color: "#fff" }}
+            onClick={() => handleEdit(record)}
+          >
+            Edit
+          </Button>
+          <Button
+            style={{ backgroundColor: "red", color: "#fff" }}
+            onClick={() => handleDelete(record.key)}
+          >
+            Delete
+          </Button>
         </Space>
       ),
     },
@@ -119,6 +131,24 @@ const OtaOnalar: React.FC = () => {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setAddParent({ ...addParent, [e.target.name]: e.target.value });
   };
+
+  const handleStudentChange = (value: string) => {
+    const student = students.find((student) => student.key === Number(value));
+    if (student) {
+      setAddParent({
+        ...addParent,
+        childName: `${student.firstName} ${student.lastName}`,
+        childClass: student.className,
+        childTeacher: student.teacherName,
+      });
+      form.setFieldsValue({
+        childName: `${student.firstName} ${student.lastName}`,
+        childClass: student.className,
+        childTeacher: student.teacherName,
+      });
+    }
+  };
+
 
   const showModal = () => {
     setIsModalOpen(true);
@@ -136,6 +166,7 @@ const OtaOnalar: React.FC = () => {
       childTeacher: "",
     });
   };
+
 
   const handleCancel = () => {
     setIsModalOpen(false);
@@ -170,15 +201,13 @@ const OtaOnalar: React.FC = () => {
   };
 
   const hasSelected = selectedRowKeys.length > 0;
+
   return (
     <div style={{ padding: "24px", backgroundColor: "#fff" }}>
       <Button
         type="primary"
         onClick={showModal}
-        style={{
-          backgroundColor:"green",
-          marginBottom: "10px",
-        }}
+        style={{ backgroundColor: "green", marginBottom: "10px" }}
       >
         Add Parent
       </Button>
@@ -227,8 +256,44 @@ const OtaOnalar: React.FC = () => {
         columns={columns}
         dataSource={parentData}
         pagination={{ pageSize: 5 }}
-        loading={loading}
+        rowKey="key"
       />
+
+      <Modal
+        title={currentParent ? "Edit Parent" : "Add Parent"}
+        open={open}
+        onCancel={() => setOpen(false)}
+        footer={null}
+      >
+        <Form form={form} onFinish={onFinish}>
+          <Form.Item name="firstName" label="First Name" rules={[{ required: true, message: "Please enter first name" }]}>
+            <Input />
+          </Form.Item>
+          <Form.Item name="lastName" label="Last Name" rules={[{ required: true, message: "Please enter last name" }]}>
+            <Input />
+          </Form.Item>
+          <Form.Item name="childName" label="Child's Name">
+            <Select onChange={handleStudentChange} placeholder="Select a student">
+              {students.map((student) => (
+                <Option key={student.key} value={student.key.toString()}>
+                  {student.firstName} {student.lastName}
+                </Option>
+              ))}
+            </Select>
+          </Form.Item>
+          <Form.Item name="childClass" label="Child's Class">
+            <Input />
+          </Form.Item>
+          <Form.Item name="childTeacher" label="Child's Teacher">
+            <Input />
+          </Form.Item>
+          <Form.Item>
+            <Button type="primary" htmlType="submit">
+              {currentParent ? "Update" : "Add"}
+            </Button>
+          </Form.Item>
+        </Form>
+      </Modal>
 
       <Modal
         title="Add Parent"
@@ -236,150 +301,44 @@ const OtaOnalar: React.FC = () => {
         onOk={handleOk}
         onCancel={handleCancel}
       >
-        <Form layout="vertical">
-          <Form.Item
-            label="Parent First Name"
-            required
-            style={{ marginTop: "10px" }}
-          >
-            <Input
-              name="firstName"
-              placeholder="Parent First Name"
-              value={addParent.firstName}
-              onChange={handleInputChange}
-            />
-          </Form.Item>
-          <Form.Item
-            label="Parent Last Name"
-            required
-            style={{ marginTop: "10px" }}
-          >
-            <Input
-              name="lastName"
-              placeholder="Parent Last Name"
-              value={addParent.lastName}
-              onChange={handleInputChange}
-            />
-          </Form.Item>
-          <Form.Item
-            label="Child's Name"
-            required
-            style={{ marginTop: "10px" }}
-          >
-            <Input
-              name="childName"
-              placeholder="Child's Name"
-              value={addParent.childName}
-              onChange={handleInputChange}
-            />
-          </Form.Item>
-          <Form.Item
-            label="Child's Class"
-            required
-            style={{ marginTop: "10px" }}
-          >
-            <Input
-              name="childClass"
-              placeholder="Child's Class"
-              value={addParent.childClass}
-              onChange={handleInputChange}
-            />
-          </Form.Item>
-          <Form.Item
-            label="Child's Teacher"
-            required
-            style={{ marginTop: "10px" }}
-          >
-            <Input
-              name="childTeacher"
-              placeholder="Child's Teacher"
-              value={addParent.childTeacher}
-              onChange={handleInputChange}
-            />
-          </Form.Item>
-        </Form>
-      </Modal>
-
-      <Modal
-        visible={open}
-        title={currentParent ? "Edit Parent" : "Add New Parent"}
-        onCancel={() => setOpen(false)}
-        footer={[
-          <Button key="cancel" onClick={() => setOpen(false)}>
-            Cancel
-          </Button>,
-          <Button key="submit" type="primary" onClick={() => form.submit()}>
-            Save
-          </Button>,
-        ]}
-      >
-        <Form
-          form={form}
-          layout="vertical"
-          name="parentForm"
-          onFinish={onFinish}
+        <Input
+          placeholder="First Name"
+          name="firstName"
+          value={addParent.firstName}
+          onChange={handleInputChange}
+        />
+        <Input
+          placeholder="Last Name"
+          name="lastName"
+          value={addParent.lastName}
+          onChange={handleInputChange}
+          style={{ marginTop: "10px" }}
+        />
+        <Select
+          placeholder="Select Child"
+          onChange={handleStudentChange}
+          style={{ marginTop: "10px", width: "100%" }}
         >
-          <Form.Item
-            name="firstName"
-            label="Parent First Name"
-            rules={[
-              {
-                required: true,
-                message: "Please input the parent's first name!",
-              },
-            ]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            name="lastName"
-            label="Parent Last Name"
-            rules={[
-              {
-                required: true,
-                message: "Please input the parent's last name!",
-              },
-            ]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            name="childName"
-            label="Child's Name"
-            rules={[
-              {
-                required: true,
-                message: "Please input the child's name!",
-              },
-            ]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            name="childClass"
-            label="Child's Class"
-            rules={[
-              {
-                required: true,
-                message: "Please input the child's class!",
-              },
-            ]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            name="childTeacher"
-            label="Child's Teacher"
-            rules={[
-              {
-                required: true,
-                message: "Please input the child's teacher!",
-              },
-            ]}
-          >
-            <Input />
-          </Form.Item>
-        </Form>
+          {students.map((student) => (
+            <Option key={student.key} value={student.key.toString()}>
+              {student.firstName} {student.lastName}
+            </Option>
+          ))}
+        </Select>
+        <Input
+          placeholder="Child's Class"
+          name="childClass"
+          value={addParent.childClass}
+          onChange={handleInputChange}
+          style={{ marginTop: "10px" }}
+        />
+        <Input
+          placeholder="Child's Teacher"
+          name="childTeacher"
+          value={addParent.childTeacher}
+          onChange={handleInputChange}
+          style={{ marginTop: "10px" }}
+        />
       </Modal>
     </div>
   );

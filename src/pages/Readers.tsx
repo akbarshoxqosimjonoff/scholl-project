@@ -13,14 +13,21 @@ interface DataType {
   subject: string;
   email: string;
   phone: string;
+  classNumber?: number;
+  classLetter?: string;
+  childName?: string;
 }
 
 const Oquvchilar: React.FC = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
   const [loading, setLoading] = useState(false);
   const [studentsData, setStudentsData] = useState<DataType[]>(() => {
-    const storedData = localStorage.getItem("studentsData");
+    const storedData = localStorage.getItem("StudentDataType");
     return storedData ? JSON.parse(storedData) : studentData;
+  });
+  const [parentsData, setParentsData] = useState<DataType[]>(() => {
+    const storedData = localStorage.getItem("ParentDataType");
+    return storedData ? JSON.parse(storedData) : [];
   });
   const [searchText, setSearchText] = useState("");
   const [addTeacher, setAddTeacher] = useState<DataType>({
@@ -30,6 +37,9 @@ const Oquvchilar: React.FC = () => {
     subject: "",
     email: "",
     phone: "",
+    classNumber: undefined,
+    classLetter: undefined,
+    childName: "",
   });
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -49,8 +59,9 @@ const Oquvchilar: React.FC = () => {
   }, [searchText, studentsData]);
 
   useEffect(() => {
-    localStorage.setItem("studentsData", JSON.stringify(studentsData));
-  }, [studentsData]);
+    localStorage.setItem("StudentDataType", JSON.stringify(studentsData));
+    localStorage.setItem("ParentDataType", JSON.stringify(parentsData));
+  }, [studentsData, parentsData]);
 
   const filterData = (data: DataType[], search: string) => {
     return data.filter((item) =>
@@ -79,9 +90,14 @@ const Oquvchilar: React.FC = () => {
   const columns: TableColumnsType<DataType> = [
     { title: "First Name", dataIndex: "firstName", key: "firstName" },
     { title: "Last Name", dataIndex: "lastName", key: "lastName" },
-    { title: "Subject", dataIndex: "subject", key: "subject" },
     {
-      title: "action",
+      title: "Class",
+      key: "class",
+      render: (_, record) =>
+        `${record.classNumber || "N/A"}${record.classLetter || ""}`,
+    },
+    {
+      title: "Action",
       dataIndex: "action",
       key: "action",
       render: (_, record) => (
@@ -123,7 +139,22 @@ const Oquvchilar: React.FC = () => {
   };
 
   const handleOk = () => {
-    setStudentsData([...studentsData, { ...addTeacher, key: Date.now() }]);
+    const newStudent: DataType = {
+      ...addTeacher,
+      key: Date.now(),
+    };
+
+    setStudentsData([...studentsData, newStudent]);
+    setParentsData(
+      parentsData.map((parent) => ({
+        ...parent,
+        childName:
+          parent.childName === ""
+            ? `${addTeacher.firstName} ${addTeacher.lastName}`
+            : parent.childName,
+      }))
+    );
+
     setIsModalOpen(false);
     setAddTeacher({
       key: Date.now(),
@@ -132,6 +163,9 @@ const Oquvchilar: React.FC = () => {
       subject: "",
       email: "",
       phone: "",
+      classNumber: undefined,
+      classLetter: undefined,
+      childName: "",
     });
   };
 
@@ -162,6 +196,10 @@ const Oquvchilar: React.FC = () => {
       firstName: student.firstName,
       lastName: student.lastName,
       subject: student.subject,
+      email: student.email,
+      phone: student.phone,
+      classNumber: student.classNumber,
+      classLetter: student.classLetter,
     });
   };
 
@@ -263,82 +301,96 @@ const Oquvchilar: React.FC = () => {
             onChange={handleInputChange}
           />
         </div>
+
         <div style={{ marginTop: "10px" }}>
-          <label style={{ marginTop: "10px" }}>*Subject</label>
-          <Input
-            name="subject"
-            placeholder="Subject"
-            value={addTeacher.subject}
-            style={{ marginTop: "5px", padding: "10px" }}
-            onChange={handleInputChange}
-          />
+          <label style={{ marginTop: "10px" }}>*Class Number</label>
+          <Select
+            value={addTeacher.classNumber ?? undefined}
+            style={{ marginTop: "5px", width: "100%" }}
+            onChange={(value) =>
+              setAddTeacher({ ...addTeacher, classNumber: value })
+            }
+          >
+            {Array.from({ length: 11 }, (_, number) => (
+              <Select.Option key={number + 1} value={number + 1}>
+                {number + 1}
+              </Select.Option>
+            ))}
+          </Select>
+        </div>
+
+        <div style={{ marginTop: "10px" }}>
+          <label style={{ marginTop: "10px" }}>*Class Letter</label>
+          <Select
+            value={addTeacher.classLetter ?? undefined}
+            style={{ marginTop: "5px", width: "100%" }}
+            onChange={(value) =>
+              setAddTeacher({ ...addTeacher, classLetter: value })
+            }
+          >
+            {["A", "B", "C", "D", "E", "F", "G"].map((letter) => (
+              <Select.Option key={letter} value={letter}>
+                {letter}
+              </Select.Option>
+            ))}
+          </Select>
         </div>
       </Modal>
 
       <Modal
-        visible={open}
-        title={currentTeacher?.key ? "Edit Teacher" : "Add New Teacher"}
+        title={currentTeacher ? "Edit Student" : "Add Student"}
+        open={open}
         onCancel={() => setOpen(false)}
-        footer={[
-          <Button key="cancel" onClick={() => setOpen(false)}>
-            Cancel
-          </Button>,
-          <Button key="submit" type="primary" onClick={() => form.submit()}>
-            Save
-          </Button>,
-        ]}
+        footer={null}
       >
-        <Form
-          form={form}
-          layout="vertical"
-          name="teacherForm"
-          onFinish={onFinish}
-        >
+        <Form form={form} onFinish={onFinish} layout="vertical">
           <Form.Item
             name="firstName"
             label="First Name"
-            rules={[
-              { required: true, message: "Please input the first name!" },
-            ]}
+            rules={[{ required: true, message: "Please input first name!" }]}
           >
             <Input />
           </Form.Item>
           <Form.Item
             name="lastName"
             label="Last Name"
-            rules={[{ required: true, message: "Please input the last name!" }]}
+            rules={[{ required: true, message: "Please input last name!" }]}
           >
             <Input />
           </Form.Item>
+
           <Form.Item
-            name="class"
-            label="class"
-            rules={[{ required: true, message: "Please select the class!" }]}
+            name="classNumber"
+            label="Class Number"
+            rules={[{ required: true, message: "Please select class number!" }]}
           >
-            <select name="sinf" style={{ marginTop: "5px", padding: "10px" }}>
-              <option value="1A">1A</option>
-              <option value="1B">1B</option>
-              <option value="2A">2A</option>
-              <option value="2B">2B</option>
-              <option value="3A">3A</option>
-              <option value="3B">3B</option>
-              <option value="4A">4A</option>
-              <option value="4B">4B</option>
-              <option value="5A">5A</option>
-              <option value="5B">5B</option>
-              <option value="6A">6A</option>
-              <option value="6B">6B</option>
-              <option value="7A">7A</option>
-              <option value="7B">7B</option>
-              <option value="8A">8A</option>
-              <option value="8B">8B</option>
-              <option value="9A">9A</option>
-              <option value="9B">9B</option>
-              <option value="10A">10A</option>
-              <option value="10B">10B</option>
-              <option value="11A">11A</option>
-              <option value="11B">11B</option>
-            </select>
+            <Select style={{ width: "100%" }}>
+              {Array.from({ length: 11 }, (_, number) => (
+                <Select.Option key={number + 1} value={number + 1}>
+                  {number + 1}
+                </Select.Option>
+              ))}
+            </Select>
+          </Form.Item>
+
+          <Form.Item
+            name="classLetter"
+            label="Class Letter"
+            rules={[{ required: true, message: "Please select class letter!" }]}
+          >
+            <Select style={{ width: "100%" }}>
+              {["A", "B", "C", "D", "E", "F", "G"].map((letter) => (
+                <Select.Option key={letter} value={letter}>
+                  {letter}
+                </Select.Option>
+              ))}
+            </Select>
+          </Form.Item>
+
+          <Form.Item>
+            <Button type="primary" htmlType="submit">
+              {currentTeacher ? "Update" : "Add"}
+            </Button>
           </Form.Item>
         </Form>
       </Modal>
