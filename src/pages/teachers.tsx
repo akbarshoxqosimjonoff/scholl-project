@@ -63,10 +63,10 @@ const Oqituvchilar: React.FC = () => {
             Edit
           </Button>
           <Popconfirm
-            title="Are you sure to delete this teacher?"
+            title="Haqiqatdan ham ochirmoqchimisz?"
             onConfirm={() => handleDelete(record.key)}
-            okText="Yes"
-            cancelText="No"
+            okText="Ha"
+            cancelText="Yoq"
           >
             <Button style={{ backgroundColor: "red", color: "#fff" }}>Delete</Button>
           </Popconfirm>

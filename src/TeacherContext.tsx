@@ -1,8 +1,6 @@
-// TeacherContext.tsx
-
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
-export interface DataType { // Ensure this name is consistent
+export interface DataType {
   key: number;
   firstName: string;
   lastName: string;
@@ -17,6 +15,7 @@ export interface TeacherContextType {
   addTeacher: (teacher: DataType) => void;
   updateTeacher: (teacher: DataType) => void;
   deleteTeacher: (key: number) => void;
+  setTeacherData: (data: DataType[]) => void; // Include this function
 }
 
 const TeacherContext = createContext<TeacherContextType | undefined>(undefined);
@@ -45,7 +44,7 @@ export const TeacherProvider: React.FC<TeacherProviderProps> = ({ children }) =>
   };
 
   return (
-    <TeacherContext.Provider value={{ teacherData, addTeacher, updateTeacher, deleteTeacher }}>
+    <TeacherContext.Provider value={{ teacherData, addTeacher, updateTeacher, deleteTeacher, setTeacherData }}>
       {children}
     </TeacherContext.Provider>
   );
