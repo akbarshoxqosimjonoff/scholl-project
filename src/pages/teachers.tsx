@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Button, Table, Space, Input, Modal, Form } from "antd";
+import { Button, Table, Space, Input, Modal, Form, Popconfirm } from "antd";
 import type { TableColumnsType } from "antd";
 import { MdOutlineRestartAlt } from "react-icons/md";
 import { useTeacher } from "../TeacherContext";
@@ -22,7 +22,7 @@ const Oqituvchilar: React.FC = () => {
   const [currentTeacher, setCurrentTeacher] = useState<DataType | null>(null);
   const [form] = Form.useForm();
 
-  const { teacherData, addTeacher, updateTeacher } = useTeacher();
+  const { teacherData, addTeacher, updateTeacher, deleteTeacher } = useTeacher();
 
   const filterData = (data: DataType[], search: string) => {
     return data.filter((item) =>
@@ -44,10 +44,6 @@ const Oqituvchilar: React.FC = () => {
     setSelectedRowKeys(newSelectedRowKeys);
   };
 
-  // const handleDelete = (key: number) => {
-  //   updateTeacher({ key, ...currentTeacher, isDeleted: true });
-  // };
-
   const columns: TableColumnsType<DataType> = [
     { title: "First Name", dataIndex: "firstName", key: "firstName" },
     { title: "Last Name", dataIndex: "lastName", key: "lastName" },
@@ -66,12 +62,14 @@ const Oqituvchilar: React.FC = () => {
           >
             Edit
           </Button>
-          {/* <Button
-            style={{ backgroundColor: "red", color: "#fff" }}
-            onClick={() => handleDelete(record.key)}
+          <Popconfirm
+            title="Are you sure to delete this teacher?"
+            onConfirm={() => handleDelete(record.key)}
+            okText="Yes"
+            cancelText="No"
           >
-            Delete
-          </Button> */}
+            <Button style={{ backgroundColor: "red", color: "#fff" }}>Delete</Button>
+          </Popconfirm>
         </Space>
       ),
     },
@@ -108,6 +106,10 @@ const Oqituvchilar: React.FC = () => {
     setCurrentTeacher(teacher);
     form.setFieldsValue(teacher);
     setIsModalOpen(true);
+  };
+
+  const handleDelete = (key: number) => {
+    deleteTeacher(key);
   };
 
   const hasSelected = selectedRowKeys.length > 0;

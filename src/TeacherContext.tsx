@@ -1,6 +1,8 @@
+// TeacherContext.tsx
+
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 
-interface DataType {
+export interface DataType { // Ensure this name is consistent
   key: number;
   firstName: string;
   lastName: string;
@@ -10,40 +12,46 @@ interface DataType {
   sinf?: string;
 }
 
-interface TeacherContextType {
+export interface TeacherContextType {
   teacherData: DataType[];
   addTeacher: (teacher: DataType) => void;
   updateTeacher: (teacher: DataType) => void;
+  deleteTeacher: (key: number) => void;
 }
 
 const TeacherContext = createContext<TeacherContextType | undefined>(undefined);
 
-export const TeacherProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [teacherData, setTeacherData] = useState<DataType[]>(() => {
-    const storedData = localStorage.getItem("teacherData");
-    return storedData ? JSON.parse(storedData) : [];
-  });
+interface TeacherProviderProps {
+  children: ReactNode;
+}
+
+export const TeacherProvider: React.FC<TeacherProviderProps> = ({ children }) => {
+  const [teacherData, setTeacherData] = useState<DataType[]>([]);
 
   const addTeacher = (teacher: DataType) => {
-    setTeacherData((prevData) => [...prevData, teacher]);
-    localStorage.setItem("teacherData", JSON.stringify([...teacherData, teacher]));
+    setTeacherData((prev) => [...prev, teacher]);
   };
 
-  const updateTeacher = (teacher: DataType) => {
-    setTeacherData((prevData) =>
-      prevData.map((t) => (t.key === teacher.key ? teacher : t))
+  const updateTeacher = (updatedTeacher: DataType) => {
+    setTeacherData((prev) =>
+      prev.map((teacher) =>
+        teacher.key === updatedTeacher.key ? updatedTeacher : teacher
+      )
     );
-    localStorage.setItem("teacherData", JSON.stringify(teacherData));
+  };
+
+  const deleteTeacher = (key: number) => {
+    setTeacherData((prev) => prev.filter((teacher) => teacher.key !== key));
   };
 
   return (
-    <TeacherContext.Provider value={{ teacherData, addTeacher, updateTeacher }}>
+    <TeacherContext.Provider value={{ teacherData, addTeacher, updateTeacher, deleteTeacher }}>
       {children}
     </TeacherContext.Provider>
   );
 };
 
-export const useTeacher = () => {
+export const useTeacher = (): TeacherContextType => {
   const context = useContext(TeacherContext);
   if (context === undefined) {
     throw new Error('useTeacher must be used within a TeacherProvider');
