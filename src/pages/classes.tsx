@@ -1,327 +1,171 @@
-import React, { useState } from "react";
-import { Table, Button, Space, Modal, Form, Input, Select } from "antd";
-import { useTeacher } from "../TeacherContext";
+import React, { useEffect, useState } from "react";
+import { Button, Form, Modal, Input, Select, Table } from "antd";
 
 const { Option } = Select;
 
+interface ITeacher {
+  firstName: string;
+  lastName: string;
+  subject: string;
+  email: string;
+  phone: string;
+}
+
+const initialTeachers = (): ITeacher[] => {
+  const storedTeachers = localStorage.getItem("teachers");
+  return storedTeachers ? JSON.parse(storedTeachers) : [];
+};
+
 const Classes: React.FC = () => {
-  const { teacherData, addTeacher, updateTeacher, deleteTeacher } =
-    useTeacher();
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentTeacher, setCurrentTeacher] = useState<any | null>(null);
+  const [teachers, setTeachers] = useState<ITeacher[]>(initialTeachers);
+  const [selectedFirstName, setSelectedFirstName] = useState<
+    string | undefined
+  >();
+  const [selectedLastName, setSelectedLastName] = useState<
+    string | undefined
+  >();
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [form] = Form.useForm();
 
-  const columns = [
-    { title: "Teacher First Name", dataIndex: "firstName", key: "firstName" },
-    { title: "Teacher Last Name", dataIndex: "lastName", key: "lastName" },
-    { title: "Class", dataIndex: "class", key: "class" },
-    {
-      title: "Actions",
-      key: "action",
-      render: (_: any, record: any) => (
-        <Space>
-          <Button
-            type="primary"
-            style={{ backgroundColor: "green", color: "#fff" }}
-            onClick={() => handleEdit(record)}
-          >
-            Edit
-          </Button>
-          <Button
-            danger
-            style={{ backgroundColor: "red", color: "#fff" }}
-            onClick={() => handleDelete(record.key)}
-          >
-            Delete
-          </Button>
-        </Space>
-      ),
-    },
-  ];
+  useEffect(() => {
+    localStorage.setItem("teachers", JSON.stringify(teachers));
+  }, [teachers]);
 
-  const handleEdit = (teacher: any) => {
-    setCurrentTeacher(teacher);
-    form.setFieldsValue({
-      teacherId: teacher.teacherId,
-      class: teacher.class,
-    });
-    setIsModalOpen(true);
+  const handleSelectFirstName = (value: string) => {
+    setSelectedFirstName(value);
   };
 
-  const handleDelete = (key: number) => {
-    deleteTeacher(key);
+  const handleSelectLastName = (value: string) => {
+    setSelectedLastName(value);
   };
 
   const handleOk = async () => {
     try {
       const values = await form.validateFields();
-      console.log("Form Values:", values);
-
-      const newClass = {
-        key: currentTeacher ? currentTeacher.key : Date.now(),
+      const newTeacher: ITeacher = {
+        firstName: selectedFirstName!,
+        lastName: selectedLastName!,
         ...values,
       };
-
-      if (currentTeacher) {
-        console.log("Updating Class:", newClass);
-        updateTeacher(newClass);
-      } else {
-        console.log("Adding Class:", newClass);
-        addTeacher(newClass);
-      }
-
+      setTeachers([...teachers, newTeacher]);
       setIsModalOpen(false);
       form.resetFields();
-      setCurrentTeacher(null);
-    } catch (error) {
-      console.error("Validation Failed:", error);
+      setSelectedFirstName(undefined);
+      setSelectedLastName(undefined);
+    } catch (errorInfo) {
+      console.log("Failed:", errorInfo);
     }
   };
 
   const handleCancel = () => {
     setIsModalOpen(false);
-    setCurrentTeacher(null);
-    form.resetFields();
   };
 
+  const columns = [
+    { title: "First Name", dataIndex: "firstName", key: "firstName" },
+    { title: "Last Name", dataIndex: "lastName", key: "lastName" },
+    { title: "Subject", dataIndex: "subject", key: "subject" },
+    { title: "Email", dataIndex: "email", key: "email" },
+    { title: "Phone", dataIndex: "phone", key: "phone" },
+  ];
   return (
     <>
-      <Button
-        onClick={() => setIsModalOpen(true)}
-        style={{
-          backgroundColor: "green",
-          color: "#fff",
-          padding: "10px 20px",
-          borderRadius: "5px",
-          cursor: "pointer",
-          fontSize: "16px",
-          transition: "background-color 0.3s ease",
-          border: "none",
-          marginBottom: "10px",
-        }}
-      >
-        Add Class
+      <Button type="primary" onClick={() => setIsModalOpen(true)}>
+        Add Teacher
       </Button>
-      <div style={{ padding: "24px", backgroundColor: "#fff" }}>
-        <Table
-          columns={columns}
-          dataSource={teacherData}
-          pagination={{ pageSize: 4 }}
-          rowKey="key"
-        />
-
-        <Modal
-          title={currentTeacher ? "Edit Class" : "Add Class"}
-          open={isModalOpen}
-          onOk={handleOk}
-          onCancel={handleCancel}
-          okText="Save"
-          cancelText="Cancel"
-        >
-          <Form form={form} layout="vertical" name="teacherForm">
-            {/* <Form.Item
-              label="Teacher"
-              name="teacherId"
-              rules={[{ required: true, message: "Please select a teacher!" }]}
+      <Modal
+        title="Add Teacher"
+        visible={isModalOpen}
+        onOk={handleOk}
+        onCancel={handleCancel}
+        okText="Save"
+        cancelText="Cancel"
+      >
+        <Form form={form} layout="vertical">
+          <Form.Item
+            label="First Name"
+            name="firstName"
+            rules={[
+              { required: true, message: "Please select the first name!" },
+            ]}
+          >
+            <Select
+              showSearch
+              placeholder="Select First Name"
+              onChange={handleSelectFirstName}
+              value={selectedFirstName}
             >
-              <Select placeholder="Select Teacher" allowClear>
-                {teacherData.map((teacher) => (
-                  <Option key={teacher.key} value={teacher.key}>
-                    {`${teacher.firstName} ${teacher.lastName}`}
-                  </Option>
-                ))}
-              </Select>
-            </Form.Item> */}
-            <Form.Item
-              label="Teacher"
-              name="teacherId"
-              rules={[{ required: true, message: "Please select a teacher!" }]}
+              {teachers.map((teacher, index) => (
+                <Option key={index} value={teacher.firstName}>
+                  {teacher.firstName}
+                </Option>
+              ))}
+            </Select>
+          </Form.Item>
+          <Form.Item
+            label="Last Name"
+            name="lastName"
+            rules={[
+              { required: true, message: "Please select the last name!" },
+            ]}
+          >
+            <Select
+              showSearch
+              placeholder="Select Last Name"
+              onChange={handleSelectLastName}
+              value={selectedLastName}
             >
-              <Select placeholder="Select Teacher" allowClear>
-                {teacherData.length ? (
-                  teacherData.map((teacher) => (
-                    <Option key={teacher.key} value={teacher.key}>
-                      {`${teacher.firstName} ${teacher.lastName}`}
-                    </Option>
-                  ))
-                ) : (
-                  <Option disabled>No teachers available</Option>
-                )}
-              </Select>
-            </Form.Item>
-            <Form.Item
-              label="Class"
-              name="class"
-              rules={[{ required: true, message: "Please input the class!" }]}
-            >
-              <Input placeholder="Class" />
-            </Form.Item>
-          </Form>
-        </Modal>
-      </div>
+              {teachers.map((teacher, index) => (
+                <Option key={index} value={teacher.lastName}>
+                  {teacher.lastName}
+                </Option>
+              ))}
+            </Select>
+          </Form.Item>
+          <Form.Item
+            label="Subject"
+            name="subject"
+            rules={[{ required: true, message: "Please select the subject!" }]}
+          >
+            <Select placeholder="Select Subject">
+              <Option value="Mathematics">Mathematics</Option>
+              <Option value="Science">Science</Option>
+              <Option value="English">English</Option>
+              <Option value="History">History</Option>
+              <Option value="Geography">Geography</Option>
+              <Option value="Biology">Biology</Option>
+              <Option value="Chemistry">Chemistry</Option>
+              <Option value="Physics">Physics</Option>
+              <Option value="Computer Science">Computer Science</Option>
+              <Option value="Art">Art</Option>
+            </Select>
+          </Form.Item>
+          <Form.Item
+            label="Email"
+            name="email"
+            rules={[{ required: true, message: "Please enter the email!" }]}
+          >
+            <Input type="email" placeholder="Email" />
+          </Form.Item>
+          <Form.Item
+            label="Phone"
+            name="phone"
+            rules={[
+              { required: true, message: "Please enter the phone number!" },
+            ]}
+          >
+            <Input type="tel" placeholder="Phone Number" />
+          </Form.Item>
+        </Form>
+      </Modal>
+      <Table
+        dataSource={teachers}
+        columns={columns}
+        rowKey="email"
+        pagination={{ pageSize: 5 }} // This enables pagination with 5 items per page
+      />
     </>
   );
 };
 
 export default Classes;
-
-// import React, { useState } from "react";
-// import { Table, Button, Space, Modal, Form, Input, Select } from "antd";
-// import { useTeacher } from "../TeacherContext";
-
-// const { Option } = Select;
-
-// const Classes: React.FC = () => {
-//   const { teacherData, addTeacher, updateTeacher, deleteTeacher } = useTeacher();
-//   const [isModalOpen, setIsModalOpen] = useState(false);
-//   const [currentTeacher, setCurrentTeacher] = useState<any | null>(null); // `any` tipidan foydalaning yoki `DataType`ni yangilang
-//   const [form] = Form.useForm();
-
-//   const columns = [
-//     { title: "Teacher First Name", dataIndex: "firstName", key: "firstName" },
-//     { title: "Teacher Last Name", dataIndex: "lastName", key: "lastName" },
-//     { title: "Class", dataIndex: "class", key: "class" },
-//     {
-//       title: "Actions",
-//       key: "action",
-//       render: (_: any, record: any) => (
-//         <Space>
-//           <Button
-//             type="primary"
-//             style={{ backgroundColor: "green", color: "#fff" }}
-//             onClick={() => handleEdit(record)}
-//           >
-//             Edit
-//           </Button>
-//           <Button
-//             danger
-//             style={{ backgroundColor: "red", color: "#fff" }}
-//             onClick={() => handleDelete(record.key)}
-//           >
-//             Delete
-//           </Button>
-//         </Space>
-//       ),
-//     },
-//   ];
-
-//   const handleEdit = (teacher: any) => {
-//     setCurrentTeacher(teacher);
-//     form.setFieldsValue({
-//       teacherId: teacher.teacherId,
-//       class: teacher.class,
-//     });
-//     setIsModalOpen(true);
-//   };
-
-//   const handleDelete = (key: number) => {
-//     deleteTeacher(key);
-//   };
-
-//   const handleOk = async () => {
-//     try {
-//       const values = await form.validateFields();
-//       console.log("Form Values:", values);
-
-//       const newClass = {
-//         key: currentTeacher ? currentTeacher.key : Date.now(),
-//         ...values,
-//       };
-
-//       if (currentTeacher) {
-//         console.log("Updating Class:", newClass);
-//         updateTeacher(newClass); // Agar siz `updateTeacher` metodini to'g'ri ishlatayotgan bo'lsangiz
-//       } else {
-//         console.log("Adding Class:", newClass);
-//         addTeacher(newClass); // Agar siz `addTeacher` metodini to'g'ri ishlatayotgan bo'lsangiz
-//       }
-
-//       setIsModalOpen(false);
-//       form.resetFields();
-//       setCurrentTeacher(null);
-//     } catch (error) {
-//       console.error("Validation Failed:", error);
-//     }
-//   };
-
-//   const handleCancel = () => {
-//     setIsModalOpen(false);
-//     setCurrentTeacher(null);
-//     form.resetFields();
-//   };
-
-//   return (
-//     <>
-//       <Button
-//         onClick={() => setIsModalOpen(true)}
-//         style={{
-//           backgroundColor: "green",
-//           color: "#fff",
-//           padding: "10px 20px",
-//           borderRadius: "5px",
-//           cursor: "pointer",
-//           fontSize: "16px",
-//           transition: "background-color 0.3s ease",
-//           border: "none",
-//           marginBottom: "10px",
-//         }}
-//       >
-//         Add Class
-//       </Button>
-//       <div style={{ padding: "24px", backgroundColor: "#fff" }}>
-//         <Table
-//           columns={columns}
-//           dataSource={teacherData}
-//           pagination={{ pageSize: 4 }}
-//           rowKey="key"
-//         />
-
-//         <Modal
-//           title={currentTeacher ? "Edit Class" : "Add Class"}
-//           open={isModalOpen}
-//           onOk={handleOk}
-//           onCancel={handleCancel}
-//           okText="Save"
-//           cancelText="Cancel"
-//         >
-//           <Form form={form} layout="vertical" name="teacherForm">
-//             <Form.Item
-//               label="Teacher"
-//               name="teacherId"
-//               rules={[{ required: true, message: "Please select a teacher!" }]}
-//             >
-//               <Select placeholder="Select Teacher">
-//                 {teacherData.map((teacher) => (
-//                   <Option key={teacher.key} value={teacher.key}>
-//                     {`${teacher.firstName} ${teacher.lastName}`}
-//                   </Option>
-//                 ))}
-//               </Select>
-//             </Form.Item>
-//             <Form.Item
-//               label="Class"
-//               name="class"
-//               rules={[{ required: true, message: "Please input the class!" }]}
-//             >
-//               <Input placeholder="Class" />
-//             </Form.Item>
-//             <Form.Item
-//               label="Class Number"
-//               name="classNumber"
-//             >
-//               <Select placeholder="Select a number">
-//                 {Array.from({ length: 11 }, (_, number) => (
-//                   <Option key={number + 1} value={number + 1}>
-//                     {number + 1}
-//                   </Option>
-//                 ))}
-//               </Select>
-//             </Form.Item>
-//           </Form>
-//         </Modal>
-//       </div>
-//     </>
-//   );
-// };
-
-// export default Classes;
