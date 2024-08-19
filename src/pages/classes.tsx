@@ -37,13 +37,11 @@ const Classes: React.FC = () => {
           >
             Edit
           </Button>
-          <Button
-
+          <Button 
             danger
             style={{ backgroundColor: "red", color: "#fff" }}
             onClick={() => handleDelete(record.key)}
           >
-            
             Delete
           </Button>
         </Space>
