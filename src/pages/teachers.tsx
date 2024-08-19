@@ -1,5 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { Button, Table, Space, Input, Modal, Form, Popconfirm } from "antd";
+import {
+  Button,
+  Table,
+  Space,
+  Input,
+  Modal,
+  Form,
+  Popconfirm,
+  Select,
+} from "antd";
 import type { TableColumnsType } from "antd";
 import { MdOutlineRestartAlt } from "react-icons/md";
 import { useTeacher } from "../TeacherContext";
@@ -12,7 +21,11 @@ interface DataType {
   email: string;
   phone: string;
   sinf?: string;
+  classNumber?: number;
+  classLetter?: string;
 }
+
+const { Option } = Select;
 
 const Oqituvchilar: React.FC = () => {
   const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
@@ -22,7 +35,13 @@ const Oqituvchilar: React.FC = () => {
   const [currentTeacher, setCurrentTeacher] = useState<DataType | null>(null);
   const [form] = Form.useForm();
 
-  const { teacherData, setTeacherData, addTeacher, updateTeacher, deleteTeacher } = useTeacher();
+  const {
+    teacherData,
+    setTeacherData,
+    addTeacher,
+    updateTeacher,
+    deleteTeacher,
+  } = useTeacher();
 
   useEffect(() => {
     const storedTeachers = localStorage.getItem("teachers");
@@ -61,7 +80,13 @@ const Oqituvchilar: React.FC = () => {
     { title: "Subject", dataIndex: "subject", key: "subject" },
     { title: "Email", dataIndex: "email", key: "email" },
     { title: "Phone", dataIndex: "phone", key: "phone" },
-    { title: "Class", dataIndex: "sinf", key: "sinf" },
+    {
+      title: "Class",
+      dataIndex: "class",
+      key: "class",
+      render: (text) => text || "N/A",
+    },
+
     {
       title: "Actions",
       key: "action",
@@ -79,7 +104,9 @@ const Oqituvchilar: React.FC = () => {
             okText="Yes"
             cancelText="No"
           >
-            <Button style={{ backgroundColor: "red", color: "#fff" }}>Delete</Button>
+            <Button style={{ backgroundColor: "red", color: "#fff" }}>
+              Delete
+            </Button>
           </Popconfirm>
         </Space>
       ),
@@ -94,10 +121,11 @@ const Oqituvchilar: React.FC = () => {
   const handleOk = async () => {
     try {
       const values = await form.validateFields();
+      const classValue = `${values.classNumber}${values.classLetter}`;
       if (currentTeacher) {
-        updateTeacher({ ...values, key: currentTeacher.key });
+        updateTeacher({ ...values, class: classValue, key: currentTeacher.key });
       } else {
-        addTeacher({ key: Date.now(), ...values });
+        addTeacher({ key: Date.now(), ...values, class: classValue });
       }
       setIsModalOpen(false);
       form.resetFields();
@@ -106,6 +134,7 @@ const Oqituvchilar: React.FC = () => {
       console.error("Validation Failed:", error);
     }
   };
+
 
   const handleCancel = () => {
     setIsModalOpen(false);
@@ -223,9 +252,20 @@ const Oqituvchilar: React.FC = () => {
           <Form.Item
             label="Subject"
             name="subject"
-            rules={[{ required: true, message: "Please input the subject!" }]}
+            rules={[{ required: true, message: "Please select the subject!" }]}
           >
-            <Input placeholder="Subject" />
+            <Select placeholder="Select a subject">
+              <Option value="mathematics">Mathematics</Option>
+              <Option value="science">Science</Option>
+              <Option value="english">English</Option>
+              <Option value="history">History</Option>
+              <Option value="geography">Geography</Option>
+              <Option value="biology">Biology</Option>
+              <Option value="chemistry">Chemistry</Option>
+              <Option value="physics">Physics</Option>
+              <Option value="computer_science">Computer Science</Option>
+              <Option value="art">Art</Option>
+            </Select>
           </Form.Item>
           <Form.Item
             label="Email"
@@ -243,8 +283,23 @@ const Oqituvchilar: React.FC = () => {
           >
             <Input placeholder="Phone" />
           </Form.Item>
-          <Form.Item label="Class" name="sinf">
-            <Input placeholder="Class" />
+          <Form.Item label="Class Number" name="classNumber">
+            <Select placeholder="Select a number">
+              {Array.from({ length: 11 }, (_, number) => (
+                <Option key={number + 1} value={number + 1}>
+                  {number + 1}
+                </Option>
+              ))}
+            </Select>
+          </Form.Item>
+          <Form.Item label="Class Letter" name="classLetter">
+            <Select placeholder="Select a letter">
+              {["A", "B", "C", "D", "E", "F", "G"].map((letter) => (
+                <Option key={letter} value={letter}>
+                  {letter}
+                </Option>
+              ))}
+            </Select>
           </Form.Item>
         </Form>
       </Modal>

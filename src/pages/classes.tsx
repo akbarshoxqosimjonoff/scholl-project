@@ -3,15 +3,22 @@ import { Table, Button, Space, Modal, Form, Input, Select } from "antd";
 import { useTeacher, DataType } from "../TeacherContext";
 
 const Classes: React.FC = () => {
-  const { teacherData, addTeacher, updateTeacher, deleteTeacher } = useTeacher();
+  const { teacherData, addTeacher, updateTeacher, deleteTeacher } =
+    useTeacher();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentTeacher, setCurrentTeacher] = useState<DataType | null>(null);
   const [form] = Form.useForm();
 
   const columns = [
-    { title: "Teacher firstname", dataIndex: "firstName", key: "firstName" },
-    { title: "Teacher lastname", dataIndex: "lastName", key: "lastName" },
-    { title: "Class", dataIndex: "sinf", key: "sinf" },
+    { title: "Teacher First Name", dataIndex: "firstName", key: "firstName" },
+    { title: "Teacher Last Name", dataIndex: "lastName", key: "lastName" },
+
+    {
+      title: "Class",
+      dataIndex: "class",
+      key: "class",
+      render: (text: string | undefined) => text || "N/A",
+    },
     {
       title: "Actions",
       key: "action",
@@ -84,7 +91,7 @@ const Classes: React.FC = () => {
           marginBottom: "10px",
         }}
       >
-        Sinf qo'shish
+        Add Class
       </Button>
       <div style={{ padding: "24px", backgroundColor: "#fff" }}>
         <Table
@@ -95,7 +102,7 @@ const Classes: React.FC = () => {
         />
 
         <Modal
-          title={currentTeacher ? "Edit Teacher" : "Add Teacher"}
+          title={currentTeacher ? "Edit Class" : "Add Class"}
           open={isModalOpen}
           onOk={handleOk}
           onCancel={handleCancel}
@@ -104,27 +111,14 @@ const Classes: React.FC = () => {
         >
           <Form form={form} layout="vertical" name="teacherForm">
             <Form.Item
-              label="First Name"
-              name="firstName"
-              rules={[{ required: true, message: "Please select the first name!" }]}
+              label="Teacher"
+              name="teacherId"
+              rules={[{ required: true, message: "Please select a teacher!" }]}
             >
-              <Select placeholder="Select First Name">
+              <Select placeholder="Select Teacher">
                 {teacherData.map((teacher) => (
-                  <Select.Option key={teacher.key} value={teacher.firstName}>
-                    {teacher.firstName}
-                  </Select.Option>
-                ))}
-              </Select>
-            </Form.Item>
-            <Form.Item
-              label="Last Name"
-              name="lastName"
-              rules={[{ required: true, message: "Please select the last name!" }]}
-            >
-              <Select placeholder="Select Last Name">
-                {teacherData.map((teacher) => (
-                  <Select.Option key={teacher.key} value={teacher.lastName}>
-                    {teacher.lastName}
+                  <Select.Option key={teacher.key} value={teacher.key}>
+                    {`${teacher.firstName} ${teacher.lastName}`}
                   </Select.Option>
                 ))}
               </Select>
