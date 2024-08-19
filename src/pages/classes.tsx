@@ -1,25 +1,12 @@
-import React, { useState, useEffect } from "react";
-import { Table, Button, Space, Modal, Form, Input } from "antd";
+import React, { useState } from "react";
+import { Table, Button, Space, Modal, Form, Input, Select } from "antd";
 import { useTeacher, DataType } from "../TeacherContext";
 
 const Classes: React.FC = () => {
-  const { teacherData, setTeacherData, addTeacher, updateTeacher, deleteTeacher } = useTeacher(); // Ensure setTeacherData is available
+  const { teacherData, addTeacher, updateTeacher, deleteTeacher } = useTeacher();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentTeacher, setCurrentTeacher] = useState<DataType | null>(null);
   const [form] = Form.useForm();
-
-  useEffect(() => {
-    // Load data from localStorage when the component mounts
-    const storedData = localStorage.getItem("teacherData");
-    if (storedData) {
-      setTeacherData(JSON.parse(storedData));
-    }
-  }, [setTeacherData]);
-
-  useEffect(() => {
-    // Save data to localStorage whenever teacherData changes
-    localStorage.setItem("teacherData", JSON.stringify(teacherData));
-  }, [teacherData]);
 
   const columns = [
     { title: "Teacher firstname", dataIndex: "firstName", key: "firstName" },
@@ -37,7 +24,7 @@ const Classes: React.FC = () => {
           >
             Edit
           </Button>
-          <Button 
+          <Button
             danger
             style={{ backgroundColor: "red", color: "#fff" }}
             onClick={() => handleDelete(record.key)}
@@ -63,11 +50,9 @@ const Classes: React.FC = () => {
     try {
       const values = await form.validateFields();
       if (currentTeacher) {
-        // Update existing teacher
         updateTeacher({ ...values, key: currentTeacher.key });
       } else {
-        // Add new teacher
-        addTeacher({ ...values, key: Date.now() }); // Create a unique key using Date.now()
+        addTeacher({ ...values, key: Date.now() });
       }
       setIsModalOpen(false);
       form.resetFields();
@@ -121,49 +106,34 @@ const Classes: React.FC = () => {
             <Form.Item
               label="First Name"
               name="firstName"
-              rules={[
-                { required: true, message: "Please input the first name!" },
-              ]}
+              rules={[{ required: true, message: "Please select the first name!" }]}
             >
-              <Input placeholder="First Name" />
+              <Select placeholder="Select First Name">
+                {teacherData.map((teacher) => (
+                  <Select.Option key={teacher.key} value={teacher.firstName}>
+                    {teacher.firstName}
+                  </Select.Option>
+                ))}
+              </Select>
             </Form.Item>
             <Form.Item
               label="Last Name"
               name="lastName"
-              rules={[
-                { required: true, message: "Please input the last name!" },
-              ]}
+              rules={[{ required: true, message: "Please select the last name!" }]}
             >
-              <Input placeholder="Last Name" />
+              <Select placeholder="Select Last Name">
+                {teacherData.map((teacher) => (
+                  <Select.Option key={teacher.key} value={teacher.lastName}>
+                    {teacher.lastName}
+                  </Select.Option>
+                ))}
+              </Select>
             </Form.Item>
             <Form.Item
-              label="Subject"
-              name="subject"
-              rules={[
-                { required: true, message: "Please input the subject!" },
-              ]}
+              label="Class"
+              name="sinf"
+              rules={[{ required: true, message: "Please input the class!" }]}
             >
-              <Input placeholder="Subject" />
-            </Form.Item>
-            <Form.Item
-              label="Email"
-              name="email"
-              rules={[
-                { required: true, message: "Please input the email!" },
-              ]}
-            >
-              <Input placeholder="Email" />
-            </Form.Item>
-            <Form.Item
-              label="Phone"
-              name="phone"
-              rules={[
-                { required: true, message: "Please input the phone number!" },
-              ]}
-            >
-              <Input placeholder="Phone" />
-            </Form.Item>
-            <Form.Item label="Class" name="sinf">
               <Input placeholder="Class" />
             </Form.Item>
           </Form>

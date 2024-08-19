@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button, Table, Space, Input, Modal, Form, Popconfirm } from "antd";
 import type { TableColumnsType } from "antd";
 import { MdOutlineRestartAlt } from "react-icons/md";
@@ -22,7 +22,18 @@ const Oqituvchilar: React.FC = () => {
   const [currentTeacher, setCurrentTeacher] = useState<DataType | null>(null);
   const [form] = Form.useForm();
 
-  const { teacherData, addTeacher, updateTeacher, deleteTeacher } = useTeacher();
+  const { teacherData, setTeacherData, addTeacher, updateTeacher, deleteTeacher } = useTeacher();
+
+  useEffect(() => {
+    const storedTeachers = localStorage.getItem("teachers");
+    if (storedTeachers) {
+      setTeacherData(JSON.parse(storedTeachers));
+    }
+  }, [setTeacherData]);
+
+  useEffect(() => {
+    localStorage.setItem("teachers", JSON.stringify(teacherData));
+  }, [teacherData]);
 
   const filterData = (data: DataType[], search: string) => {
     return data.filter((item) =>
@@ -65,8 +76,8 @@ const Oqituvchilar: React.FC = () => {
           <Popconfirm
             title="Haqiqatdan ham ochirmoqchimisz?"
             onConfirm={() => handleDelete(record.key)}
-            okText="Ha"
-            cancelText="Yoq"
+            okText="Yes"
+            cancelText="No"
           >
             <Button style={{ backgroundColor: "red", color: "#fff" }}>Delete</Button>
           </Popconfirm>
