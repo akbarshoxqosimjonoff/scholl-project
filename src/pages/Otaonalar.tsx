@@ -18,13 +18,12 @@ interface StudentDataType {
   key: number;
   firstName: string;
   lastName: string;
-  className: string;
+  classNumber: string;
+  classLetter: string;
   teacherName: string;
 }
 
-const initialStudents: StudentDataType[] = [
-
-];
+const initialStudents: StudentDataType[] = [];
 
 const initialData: ParentDataType[] = [
   {
@@ -43,10 +42,8 @@ const OtaOnalar: React.FC = () => {
     const storedData = localStorage.getItem("parentData");
     return storedData ? JSON.parse(storedData) : initialData;
   });
-  const [students, setStudents] = useState<StudentDataType[]>(() => {
-    const storedData = localStorage.getItem("studentsData");
-    return storedData ? JSON.parse(storedData) : initialStudents;
-  });
+  const [students, setStudents] = useState<StudentDataType[]>(initialStudents);
+
   const [searchText, setSearchText] = useState("");
   const [addParent, setAddParent] = useState<ParentDataType>({
     key: Date.now(),
@@ -58,12 +55,25 @@ const OtaOnalar: React.FC = () => {
   });
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [open, setOpen] = useState(false);
-  const [currentParent, setCurrentParent] = useState<ParentDataType | null>(null);
+  const [btnDisabled, setBtnDisabled] = useState(true);
+  const [currentParent, setCurrentParent] = useState<ParentDataType | null>(
+    null
+  );
   const [form] = Form.useForm();
 
   useEffect(() => {
+    // Fetch students from local storage on component mount
+    const storedStudentData = localStorage.getItem("StudentDataType");
+    if (storedStudentData) {
+      const parsedStudents = JSON.parse(storedStudentData);
+      setStudents(parsedStudents);
+      console.log("Students on mount:", parsedStudents);
+    }
+  }, []);
+
+  useEffect(() => {
     const storedParentData = localStorage.getItem("parentData");
-    const storedStudentData = localStorage.getItem("studentsData");
+    const storedStudentData = localStorage.getItem("StudentDataType");
 
     if (storedParentData) {
       setParentData(JSON.parse(storedParentData));
@@ -76,7 +86,7 @@ const OtaOnalar: React.FC = () => {
 
   useEffect(() => {
     localStorage.setItem("parentData", JSON.stringify(parentData));
-    localStorage.setItem("studentsData", JSON.stringify(students));
+    localStorage.setItem("StudentDataType", JSON.stringify(students));
   }, [parentData, students]);
 
   const onSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -99,8 +109,27 @@ const OtaOnalar: React.FC = () => {
     { title: "First Name", dataIndex: "firstName", key: "firstName" },
     { title: "Last Name", dataIndex: "lastName", key: "lastName" },
     { title: "Child's Name", dataIndex: "childName", key: "childName" },
-    { title: "Child's Class", dataIndex: "childClass", key: "childClass" },
-    { title: "Child's Teacher", dataIndex: "childTeacher", key: "childTeacher" },
+    {
+      title: "Child's Class Number",
+      dataIndex: "classNumber",
+      key: "classNumber",
+    },
+    {
+      title: "Child's Class Letter",
+      dataIndex: "classLetter",
+      key: "classLetter",
+    },
+    {
+      title: "Child's TeacherName",
+      dataIndex: "childTeacher",
+      key: "childTeacher",
+    },
+
+    {
+      title: "Child's Teacher",
+      dataIndex: "childTeacher",
+      key: "childTeacher",
+    },
     {
       title: "Actions",
       key: "actions",
@@ -135,20 +164,21 @@ const OtaOnalar: React.FC = () => {
   const handleStudentChange = (value: string) => {
     const student = students.find((student) => student.key === Number(value));
     if (student) {
+      setBtnDisabled(true);
+
       setAddParent({
         ...addParent,
         childName: `${student.firstName} ${student.lastName}`,
-        childClass: student.className,
+        childClass: `${student.classNumber} ${student.classLetter}`,
         childTeacher: student.teacherName,
       });
       form.setFieldsValue({
         childName: `${student.firstName} ${student.lastName}`,
-        childClass: student.className,
+        childClass: `${student.classNumber} ${student.classLetter}`,
         childTeacher: student.teacherName,
       });
     }
   };
-
 
   const showModal = () => {
     setIsModalOpen(true);
@@ -166,7 +196,6 @@ const OtaOnalar: React.FC = () => {
       childTeacher: "",
     });
   };
-
 
   const handleCancel = () => {
     setIsModalOpen(false);
@@ -211,6 +240,7 @@ const OtaOnalar: React.FC = () => {
       >
         Add Parent
       </Button>
+
       <div
         style={{
           backgroundColor: "#f5f5f5",
@@ -266,14 +296,25 @@ const OtaOnalar: React.FC = () => {
         footer={null}
       >
         <Form form={form} onFinish={onFinish}>
-          <Form.Item name="firstName" label="First Name" rules={[{ required: true, message: "Please enter first name" }]}>
+          <Form.Item
+            name="firstName"
+            label="First Name"
+            rules={[{ required: true, message: "Please enter first name" }]}
+          >
             <Input />
           </Form.Item>
-          <Form.Item name="lastName" label="Last Name" rules={[{ required: true, message: "Please enter last name" }]}>
+          <Form.Item
+            name="lastName"
+            label="Last Name"
+            rules={[{ required: true, message: "Please enter last name" }]}
+          >
             <Input />
           </Form.Item>
           <Form.Item name="childName" label="Child's Name">
-            <Select onChange={handleStudentChange} placeholder="Select a student">
+            <Select
+              onChange={handleStudentChange}
+              placeholder="Select a student"
+            >
               {students.map((student) => (
                 <Option key={student.key} value={student.key.toString()}>
                   {student.firstName} {student.lastName}
@@ -282,10 +323,10 @@ const OtaOnalar: React.FC = () => {
             </Select>
           </Form.Item>
           <Form.Item name="childClass" label="Child's Class">
-            <Input />
+            <Input disabled={true} />
           </Form.Item>
           <Form.Item name="childTeacher" label="Child's Teacher">
-            <Input />
+            <Input disabled={true} />
           </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit">
@@ -314,11 +355,7 @@ const OtaOnalar: React.FC = () => {
           onChange={handleInputChange}
           style={{ marginTop: "10px" }}
         />
-        <Select
-          placeholder="Select Child"
-          onChange={handleStudentChange}
-          style={{ marginTop: "10px", width: "100%" }}
-        >
+        <Select onChange={handleStudentChange} placeholder="Select a student">
           {students.map((student) => (
             <Option key={student.key} value={student.key.toString()}>
               {student.firstName} {student.lastName}

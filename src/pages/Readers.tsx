@@ -16,6 +16,7 @@ interface DataType {
   classNumber?: number;
   classLetter?: string;
   childName?: string;
+  teacherName?: string;
 }
 
 const Oquvchilar: React.FC = () => {
@@ -40,6 +41,7 @@ const Oquvchilar: React.FC = () => {
     classNumber: undefined,
     classLetter: undefined,
     childName: "",
+    teacherName: "",
   });
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -90,6 +92,8 @@ const Oquvchilar: React.FC = () => {
   const columns: TableColumnsType<DataType> = [
     { title: "First Name", dataIndex: "firstName", key: "firstName" },
     { title: "Last Name", dataIndex: "lastName", key: "lastName" },
+    // { title: "Teacher Name", dataIndex: "teacherName", key: "teacherName" },
+
     {
       title: "Class",
       key: "class",
@@ -301,6 +305,16 @@ const Oquvchilar: React.FC = () => {
             onChange={handleInputChange}
           />
         </div>
+        <div style={{ marginTop: "10px" }}>
+          <label style={{ marginTop: "10px" }}>*Teacher Name</label>
+          <Input
+            name="teacherName"
+            placeholder="Teacher Name"
+            value={addTeacher.teacherName}
+            style={{ marginTop: "5px", padding: "10px" }}
+            onChange={handleInputChange}
+          />
+        </div>
 
         <div style={{ marginTop: "10px" }}>
           <label style={{ marginTop: "10px" }}>*Class Number</label>
@@ -355,6 +369,13 @@ const Oquvchilar: React.FC = () => {
             name="lastName"
             label="Last Name"
             rules={[{ required: true, message: "Please input last name!" }]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            name="teacherName"
+            label="Teacher Name"
+            rules={[{ required: true, message: "Please input Teacher name!" }]}
           >
             <Input />
           </Form.Item>
