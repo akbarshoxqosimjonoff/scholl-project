@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Button, Form, Modal, Input, Select, Table } from "antd";
+import { Button, Form, Modal, Input, Select, Table, Space, Popconfirm } from "antd";
 
 const { Option } = Select;
 
@@ -9,6 +9,8 @@ interface ITeacher {
   subject: string;
   email: string;
   phone: string;
+  class?: string; // Qo'shilgan xususiyat
+  key?: string; // `key` may be used for uniquely identifying rows
 }
 
 const initialTeachers = (): ITeacher[] => {
@@ -18,12 +20,8 @@ const initialTeachers = (): ITeacher[] => {
 
 const Classes: React.FC = () => {
   const [teachers, setTeachers] = useState<ITeacher[]>(initialTeachers);
-  const [selectedFirstName, setSelectedFirstName] = useState<
-    string | undefined
-  >();
-  const [selectedLastName, setSelectedLastName] = useState<
-    string | undefined
-  >();
+  const [selectedFirstName, setSelectedFirstName] = useState<string | undefined>();
+  const [selectedLastName, setSelectedLastName] = useState<string | undefined>();
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [form] = Form.useForm();
 
@@ -46,6 +44,8 @@ const Classes: React.FC = () => {
         firstName: selectedFirstName!,
         lastName: selectedLastName!,
         ...values,
+        class: `${values.classNumber}-${values.classLetter}`, // `class` xususiyatini qo'shamiz
+        key: values.email, // use email as unique key
       };
       setTeachers([...teachers, newTeacher]);
       setIsModalOpen(false);
@@ -61,13 +61,49 @@ const Classes: React.FC = () => {
     setIsModalOpen(false);
   };
 
+  const handleDelete = (email: string) => {
+    setTeachers(teachers.filter((teacher) => teacher.email !== email));
+  };
+
+  const handleEdit = (record: ITeacher) => {
+    form.setFieldsValue(record);
+    setSelectedFirstName(record.firstName);
+    setSelectedLastName(record.lastName);
+    setIsModalOpen(true);
+  };
+
   const columns = [
     { title: "First Name", dataIndex: "firstName", key: "firstName" },
     { title: "Last Name", dataIndex: "lastName", key: "lastName" },
     { title: "Subject", dataIndex: "subject", key: "subject" },
-    { title: "Email", dataIndex: "email", key: "email" },
-    { title: "Phone", dataIndex: "phone", key: "phone" },
+    { title: "Class", dataIndex: "class", key: "class" },
+
+    {
+      title: "Actions",
+      key: "action",
+      render: (_: any, record: ITeacher) => (
+        <Space>
+          <Button
+            style={{ backgroundColor: "green", color: "#fff" }}
+            onClick={() => handleEdit(record)}
+          >
+            Edit
+          </Button>
+          <Popconfirm
+            title="Haqiqatdan ham o‘chirmoqchimisiz?"
+            onConfirm={() => handleDelete(record.email)}
+            okText="Yes"
+            cancelText="No"
+          >
+            <Button style={{ backgroundColor: "red", color: "#fff" }}>
+              Delete
+            </Button>
+          </Popconfirm>
+        </Space>
+      ),
+    },
   ];
+
   return (
     <>
       <Button type="primary" onClick={() => setIsModalOpen(true)}>
@@ -85,9 +121,7 @@ const Classes: React.FC = () => {
           <Form.Item
             label="First Name"
             name="firstName"
-            rules={[
-              { required: true, message: "Please select the first name!" },
-            ]}
+            rules={[{ required: true, message: "Please select the first name!" }]}
           >
             <Select
               showSearch
@@ -105,9 +139,7 @@ const Classes: React.FC = () => {
           <Form.Item
             label="Last Name"
             name="lastName"
-            rules={[
-              { required: true, message: "Please select the last name!" },
-            ]}
+            rules={[{ required: true, message: "Please select the last name!" }]}
           >
             <Select
               showSearch
@@ -140,29 +172,32 @@ const Classes: React.FC = () => {
               <Option value="Art">Art</Option>
             </Select>
           </Form.Item>
-          <Form.Item
-            label="Email"
-            name="email"
-            rules={[{ required: true, message: "Please enter the email!" }]}
-          >
-            <Input type="email" placeholder="Email" />
+          <Form.Item label="Class Number" name="classNumber">
+            <Select placeholder="Select a number">
+              {Array.from({ length: 11 }, (_, number) => (
+                <Option key={number + 1} value={number + 1}>
+                  {number + 1}
+                </Option>
+              ))}
+            </Select>
           </Form.Item>
-          <Form.Item
-            label="Phone"
-            name="phone"
-            rules={[
-              { required: true, message: "Please enter the phone number!" },
-            ]}
-          >
-            <Input type="tel" placeholder="Phone Number" />
+          <Form.Item label="Class Letter" name="classLetter">
+            <Select placeholder="Select a letter">
+              {["A", "B", "C", "D", "E", "F", "G"].map((letter) => (
+                <Option key={letter} value={letter}>
+                  {letter}
+                </Option>
+              ))}
+            </Select>
           </Form.Item>
+
         </Form>
       </Modal>
       <Table
         dataSource={teachers}
         columns={columns}
         rowKey="email"
-        pagination={{ pageSize: 5 }} // This enables pagination with 5 items per page
+        pagination={{ pageSize: 5 }}
       />
     </>
   );
